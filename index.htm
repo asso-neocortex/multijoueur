@@ -1,0 +1,128 @@
+<html>
+<head>
+
+</head>
+<body onload="init()" scroll="no" style="overflow: hidden">
+    <button id="button" onclick="launch()">C'EST PARTI !</button>
+    <canvas id="picker"></canvas>
+    <script>
+        
+        var canvas;
+        var button;
+        var context;
+        var radius;
+        var counterClockwise = false;
+        var my_angle = Math.PI;
+        var touched = false;
+        
+        function init() {
+            canvas = document.getElementById('picker');
+            button = document.getElementById('button');
+            button.style.width = window.innerWidth;
+            button.style.height= window.innerHeight;
+            button.style.fontSize = "60px";
+            button.style.backgroundColor = "black";
+            button.style.color = "white";
+            button.style.textAlign = "centered";
+            button.style.verticalAlign = "middle";
+            
+            if (canvas.getContext) {
+            context = canvas.getContext("2d");
+ 
+            window.addEventListener('resize', resizeCanvas, false);
+            window.addEventListener('orientationchange', resizeCanvas, false);
+            resizeCanvas();
+            canvas.style.display === "none";
+            }
+            radius = Math.max(canvas.width,canvas.height);
+            canvas.addEventListener("touchstart", handleStart, false);
+            canvas.addEventListener("touchend", handleEnd, false);
+            canvas.addEventListener("touchcancel", handleEnd, false);
+            canvas.addEventListener("touchleave", handleEnd, false);
+            canvas.addEventListener("touchmove", handleStart, false);
+            square();
+        }
+        
+        function fullscreen(){
+            if(canvas.webkitRequestFullScreen) {
+               canvas.webkitRequestFullScreen();
+           }
+          else {
+             canvas.mozRequestFullScreen();
+          }            
+        }
+ 
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        function handleStart(evt) {
+            touched = true;
+            updatePos(evt);
+            square();
+        }
+        
+         function handleEnd(evt) {
+            touched = false;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            square();
+        }
+
+
+
+        function getMousePos(canvas, evt) {
+          var rect = canvas.getBoundingClientRect();
+          return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+          };
+        }
+        
+
+        function updatePos(evt) {
+            var touchX = evt.touches[0].pageX;
+            var touchY = evt.touches[0].pageY;
+            var ctr_x = canvas.getBoundingClientRect().right / 2;
+            var ctr_y = canvas.getBoundingClientRect().bottom / 2;
+            my_angle = Math.atan2(touchY - ctr_y, touchX - ctr_x) * 180 / Math.PI;
+        }
+
+
+/*        function wheel() {
+          for (var angle = 0; angle <= 360; angle += 0.1) {
+              var x = canvas.width / 2;
+              var y = canvas.height / 2;
+              var startAngle = (angle - 0.1) * Math.PI / 180;
+              var endAngle = (angle) * Math.PI / 180;
+              context.beginPath();
+              context.moveTo(x, y);
+              context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
+              context.closePath();
+              context.fillStyle = 'hsl(' + angle + ', 100%, 50%)';
+              context.fill();
+          }
+        }*/
+
+        function square() {
+          context.beginPath();
+          context.rect(0, 0, canvas.width, canvas.height);
+          if(touched) {
+              context.fillStyle = 'hsl(' + my_angle + ', 100%, 50%)';
+          }
+          else {
+              context.fillStyle = "black";
+          }
+                
+          context.fill();
+        }
+         
+        function launch() {
+           button.style.display = "none";
+           canvas.style.display = "block";
+           fullscreen();
+        }
+
+    </script>
+</body>
+</html>
